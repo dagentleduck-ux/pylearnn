@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PyLearn: Python Adventures</title>
+    <link id="theme-style" rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+</head>
+
+<body>
+    <div id="loader" class="screen active">
+        <div class="loader-content">
+            <div class="loader-animal">🐍</div>
+            <h2>Waking up the Python Sandbox...</h2>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="load-progress" style="width: 0%;"></div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Intro & Avatar Screen -->
+    <div id="intro-screen" class="screen">
+        <div class="panel" style="max-width:600px;">
+            <h2 style="text-align:center;">Create Your Profile</h2>
+            <form id="intro-form">
+                <p style="text-align:center; color:var(--text-muted);">Pick Your Avatar</p>
+                <div class="avatar-grid" id="avatar-selection">
+                    <div class="avatar-opt selected" data-avatar="🦊">🦊</div>
+                    <div class="avatar-opt" data-avatar="🐼">🐼</div>
+                    <div class="avatar-opt" data-avatar="🐸">🐸</div>
+                    <div class="avatar-opt" data-avatar="🐯">🐯</div>
+                    <div class="avatar-opt" data-avatar="🦄">🦄</div>
+                    <div class="avatar-opt" data-avatar="🦉">🦉</div>
+                    <div class="avatar-opt" data-avatar="🤖">🤖</div>
+                    <div class="avatar-opt" data-avatar="👽">👽</div>
+                </div>
+                <input type="text" id="profile-name" placeholder="Display Name" required>
+                <select id="experience-level" required>
+                    <option value="" disabled selected>Prior Python Experience?</option>
+                    <option value="newb">Brand new to coding</option>
+                    <option value="scriptkiddie">I know some basics</option>
+                    <option value="hacker">I'm a pro (Skip basics)</option>
+                </select>
+                <p style="margin-top:2rem; font-weight:bold; margin-bottom: 0.5rem; text-align:center;">Select your Advanced Career Track:</p>
+                <div id="track-selector" style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem; margin-bottom:1rem;">
+                    <div class="track-box selected" data-track="hacking">
+                        <span style="font-size:2rem;">🥷</span><br>Cybersecurity
+                    </div>
+                    <div class="track-box" data-track="ai">
+                        <span style="font-size:2rem;">🧠</span><br>Artificial Intelligence
+                    </div>
+                    <div class="track-box" data-track="web">
+                        <span style="font-size:2rem;">🌐</span><br>Web Applications
+                    </div>
+                    <div class="track-box" data-track="gaming">
+                        <span style="font-size:2rem;">🎮</span><br>Game Engineering
+                    </div>
+                </div>
+                <input type="hidden" id="track-level" value="hacking">
+                <button type="submit" class="btn secondary-btn" style="width:100%; margin-top: 1rem;">Let's Go!</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard Screen -->
+    <div id="dashboard-screen" class="screen">
+        <header class="dash-header">
+            <div>
+                <h2 style="margin:0;">py<span style="color:var(--secondary)">learn</span></h2>
+            </div>
+            <div class="stat-group">
+                <span class="stat-badge stat-streak">🔥 <span id="dash-streak">0</span></span>
+                <span class="stat-badge stat-xp">⚡ <span id="dash-xp">0</span> XP</span>
+                <button id="settings-btn" class="btn outline-btn" style="padding: 0.5rem 1rem;">⚙️ Settings</button>
+                <button id="logout-btn" class="btn" style="padding: 0.5rem 1rem; background: var(--danger); color: white; box-shadow: 0 4px 0 var(--danger-dark); border: none;">Log Out</button>
+            </div>
+        </header>
+
+        <main class="dash-layout">
+
+            <div class="left-sidebar">
+                <div class="widget">
+                    <h3>👤 Profile</h3>
+                    <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1rem;">
+                        <span id="profile-dash-avatar" style="font-size:3rem;">🦊</span>
+                        <div>
+                            <h4 id="profile-dash-name" style="margin:0;">Name</h4>
+                            <span style="color:var(--text-muted); font-size:0.9rem;">Python Hacker</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="widget">
+                    <h3>📖 Cheat Sheet</h3>
+                    <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:0.5rem;">Unlocked knowledge
+                        (click to expand):</p>
+                    <div id="cheat-sheet-list" style="display:flex; flex-direction:column; gap:0.5rem;">
+                        <!-- Populate via JS with <details> -->
+                    </div>
+                </div>
+
+                <div class="widget"
+                    style="display: flex; flex-direction: column; height: 380px; padding: 0; overflow: hidden; border-color: #bb86fc;">
+                    <h3
+                        style="padding: 1rem 1.5rem 0.5rem 1.5rem; margin: 0; border-bottom: 2px solid var(--border-color); background: var(--surface-alt); border-top-left-radius: 16px; border-top-right-radius: 16px;">
+                        ✨ AI Assistant</h3>
+                    <div class="chat-history" id="chat-history"
+                        style="flex: 1; overflow-y: auto; padding: 1rem; background: var(--bg-color); display: flex; flex-direction: column; gap: 0.5rem;">
+                        <div class="chat-msg ai-msg" style="border-left: 3px solid #bb86fc;">Hi! I'm your free AI Helper. Ask me any Python questions you have!</div>
+                    </div>
+                    <div class="chat-input-area"
+                        style="padding: 1rem; border-top: 2px solid var(--border-color); background: var(--surface); border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;">
+                        <div style="display: flex; gap: 0.5rem;">
+                            <input type="text" id="ai-input" placeholder="Ask Gemini..." autocomplete="off"
+                                style="flex: 1; margin: 0; padding: 0.5rem; border-radius: 12px; font-size: 1rem;">
+                            <button id="ai-send-btn" class="btn primary-btn"
+                                style="padding: 0.5rem 1rem; border-radius: 12px; background: #bb86fc; box-shadow: 0 4px 0 #8c59c5; color: black;">➤</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="main-column">
+                <div class="path-container" style="position:relative;">
+                    <svg id="path-svg"
+                        style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:1; pointer-events:none;"></svg>
+                    <div class="lessons-tree" id="lessons-grid" style="position:relative; z-index:2;">
+                        <!-- SECTIONS and Lessons generated via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="widget">
+                    <h3 id="league-title">🏆 Bronze League</h3>
+                    <div id="leaderboard-list">
+                        <!-- AI Mix -->
+                    </div>
+                </div>
+
+                <div class="widget">
+                    <h3>📅 Daily Quests</h3>
+                    <div id="quests-list">
+                        <div class="quest">
+                            <div class="quest-title">Complete 2 Missions</div>
+                            <div class="progress-bar-container" style="margin-top:0.2rem; height:8px;">
+                                <div class="progress-bar" id="q1-prog" style="background:var(--warning); width:0%;">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="quest">
+                            <div class="quest-title">Earn 30 XP</div>
+                            <div class="progress-bar-container" style="margin-top:0.2rem; height:8px;">
+                                <div class="progress-bar" id="q2-prog" style="background:var(--secondary); width:0%;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="widget" id="achievements-widget">
+                    <h3>🎖️ Badges</h3>
+                    <div id="badges-list" style="display:flex; flex-wrap:wrap; gap:0.5rem; justify-content:center;">
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Settings Screen -->
+    <div id="settings-screen" class="screen">
+        <header class="dash-header">
+            <div>
+                <h2 style="margin:0;">Settings</h2>
+            </div>
+            <button id="settings-close-btn" class="btn outline-btn" style="padding: 0.5rem 1rem;">Back to Map</button>
+        </header>
+        <div class="panel" style="max-width:500px; margin: 2rem auto;">
+            <div
+                style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; border-bottom:2px solid var(--border-color); padding-bottom:1rem;">
+                <span style="font-size:1.2rem; font-weight:800;">Dark Mode</span>
+                <label class="switch">
+                    <input type="checkbox" id="toggle-dark-mode">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            <div
+                style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; border-bottom:2px solid var(--border-color); padding-bottom:1rem;">
+                <span style="font-size:1.2rem; font-weight:800;">Sound Effects</span>
+                <label class="switch">
+                    <input type="checkbox" id="toggle-sfx" checked>
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            <div style="margin-top:2rem;">
+                <button id="reset-progress-btn" class="btn"
+                    style="width:100%; background:var(--danger); color:white; box-shadow: 0 4px 0 var(--danger-dark);">Reset
+                    Progress (DANGER)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson Screen -->
+    <div id="lesson-screen" class="screen">
+        <header
+            style="display:flex; justify-content:space-between; align-items:center; max-width:1400px; width:100%; margin: 0 auto;">
+            <button id="back-to-dash-btn" class="btn outline-btn"
+                style="border-width:2px; font-size:1.5rem; padding: 0.5rem 1rem;">×</button>
+            <div class="progress-bar-container" style="max-width:500px; margin:0; height: 16px;">
+                <div class="progress-bar" id="lesson-progress-inner" style="width:0%; background:var(--primary);"></div>
+            </div>
+            <span class="stat-badge stat-xp">⚡ <span id="lesson-xp-reward">+10</span></span>
+        </header>
+
+        <div class="lesson-layout" style="max-width:1400px; margin: 2rem auto;">
+            <div class="lesson-content">
+                <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+                    <h1 id="lesson-title">Lesson Title</h1>
+                    <span id="activity-counter"
+                        style="font-weight:800; color:var(--text-muted); padding-bottom:1rem;">1/3</span>
+                </div>
+                <h3 style="color:var(--primary-dark)">Mission Briefing</h3>
+                <div id="lesson-desc" style="font-size: 1.1rem; line-height: 1.6; color:#555;"></div>
+
+                <h3 style="margin-top: 1.5rem; color:var(--primary-dark)">Mission</h3>
+                <div id="lesson-challenge"
+                    style="font-size: 1.25rem; font-weight:800; color:#333; background:white; padding:1.5rem; border-radius:12px; border:2px solid var(--border-color);">
+                </div>
+
+                <div style="display:flex; gap:1rem; margin-top:2rem;">
+                    <button id="hint-btn" class="btn warning-btn">HINT</button>
+                    <button id="explain-btn" class="btn secondary-btn"
+                        style="background:var(--secondary); color:#fff; box-shadow: 0 4px 0 var(--secondary-dark);">EXPLAIN
+                        IT BETTER</button>
+                </div>
+
+                <div id="hint-box" class="hint-box" style="margin-top:1rem;"></div>
+                <div id="explain-box" class="explain-box" style="margin-top:1rem;"></div>
+            </div>
+
+            <div class="lesson-editor">
+                <div class="editor-header">
+                    <span>> terminal.py</span>
+                </div>
+                <textarea id="code-editor" spellcheck="false"
+                    placeholder="# Type your Python code here...&#10;"></textarea>
+
+                <div class="console-output">
+                    <div
+                        style="background:#333; color: white; padding: 0.2rem 1rem; font-family:sans-serif; font-size:0.8rem; font-weight:bold;">
+                        CONSOLE</div>
+                    <pre id="console-out">Awaiting execution...</pre>
+                </div>
+
+                <div class="editor-actions" style="display:flex; flex-direction:column; gap:0.5rem;">
+                    <button id="run-code-btn" class="btn primary-btn" style="width: 100%;">VERIFY CODE</button>
+                    <button id="next-step-btn" class="btn"
+                        style="width: 100%; display:none; background:white; color:var(--primary-dark); border:2px solid var(--primary-dark); box-shadow: 0 4px 0 var(--primary-dark);">CONTINUE
+                        TO NEXT STEP</button>
+                    <button id="skip-step-btn" class="btn"
+                        style="width: 100%; background:var(--warning); color:#333; box-shadow: 0 4px 0 var(--warning-dark); border:none;">SKIP QUESTION &raquo;</button>
+                    <button id="prev-step-btn" class="btn"
+                        style="width: 100%; display:none; background:white; color:var(--text-muted); border:2px solid var(--border-color); box-shadow: 0 4px 0 var(--border-color);">&laquo; PREVIOUS STEP</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="feedback-modal" class="modal hidden">
+            <div class="modal-content success" id="feedback-content">
+                <div class="modal-info">
+                    <h3 id="feedback-title">Correct!</h3>
+                    <p id="feedback-msg" style="font-size: 1.2rem;"></p>
+                </div>
+                <div>
+                    <button id="feedback-action-btn" class="btn primary-btn"
+                        style="font-size: 1.5rem; padding: 1rem 3rem;">RETURN TO MAP</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert / Badge -->
+    <div id="badge-notification" class="badge-toast hidden">
+        <div class="badge-icon">🏆</div>
+        <div>
+            <h4 style="margin:0; font-weight:800; color:var(--warning-dark);">Achievement Unlocked!</h4>
+            <p id="badge-name" style="margin:0; font-weight:600;">Master Hacker</p>
+        </div>
+    </div>
+
+    <script src="extra_lessons.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="lessons.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
